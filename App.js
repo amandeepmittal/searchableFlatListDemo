@@ -47,7 +47,7 @@ class HomeScreen extends React.Component {
           height: 1,
           width: '86%',
           backgroundColor: '#CED0CE',
-          marginLeft: '14%'
+          marginLeft: '5%'
         }}
       />
     )
@@ -102,12 +102,7 @@ class HomeScreen extends React.Component {
           )}
           keyExtractor={item => item.email}
           ItemSeparatorComponent={this.renderSeparator}
-          ListHeaderComponent={this.renderHeader}
           ListFooterComponent={this.renderFooter}
-          onRefresh={this.handleRefresh}
-          refreshing={this.state.refreshing}
-          onEndReached={this.handleLoadMore}
-          onEndReachedThreshold={50}
         />
       </View>
     )
