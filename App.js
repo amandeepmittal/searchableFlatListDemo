@@ -5,7 +5,8 @@ import {
   ActivityIndicator,
   TouchableOpacity
 } from 'react-native'
-import { ApplicationProvider, Text, Avatar } from '@ui-kitten/components'
+import filter from 'lodash.filter'
+import { ApplicationProvider, Text, Avatar, Input } from '@ui-kitten/components'
 import { mapping, light as lightTheme } from '@eva-design/eva'
 
 class HomeScreen extends React.Component {
@@ -14,7 +15,9 @@ class HomeScreen extends React.Component {
     data: [],
     page: 1,
     seed: 1,
-    error: null
+    error: null,
+    query: '',
+    fullData: []
   }
 
   componentDidMount() {
@@ -32,13 +35,59 @@ class HomeScreen extends React.Component {
         this.setState({
           data: page === 1 ? res.results : [...this.state.data, ...res.results],
           error: res.error || null,
-          loading: false
+          loading: false,
+          fullData: res.results
         })
       })
       .catch(error => {
         this.setState({ error, loading: false })
       })
   }
+
+  contains = ({ name, email }, query) => {
+    const { first, last } = name
+    if (
+      first.includes(query) ||
+      last.includes(query) ||
+      email.includes(query)
+    ) {
+      return true
+    }
+    return false
+  }
+
+  handleSearch = text => {
+    const formattedQuery = text.toLowerCase()
+    const data = filter(this.state.fullData, user => {
+      return this.contains(user, formattedQuery)
+    })
+    this.setState({ data, query: text })
+  }
+
+  renderHeader = () => (
+    <View
+      style={{
+        backgroundColor: '#fff',
+        padding: 10,
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+      <Input
+        autoCapitalize='none'
+        autoCorrect={false}
+        onChangeText={this.handleSearch}
+        status='info'
+        placeholder='Search'
+        style={{
+          borderRadius: 25,
+          borderColor: '#333',
+          backgroundColor: '#fff'
+        }}
+        textStyle={{ color: '#000' }}
+        clearButtonMode='always'
+      />
+    </View>
+  )
 
   renderSeparator = () => {
     return (
@@ -55,7 +104,6 @@ class HomeScreen extends React.Component {
 
   renderFooter = () => {
     if (!this.state.loading) return null
-
     return (
       <View
         style={{
@@ -102,6 +150,7 @@ class HomeScreen extends React.Component {
           )}
           keyExtractor={item => item.email}
           ItemSeparatorComponent={this.renderSeparator}
+          ListHeaderComponent={this.renderHeader}
           ListFooterComponent={this.renderFooter}
         />
       </View>
